@@ -3,6 +3,8 @@
 ## Overview
 This project demonstrates my implementation of fully automated Kubernetes deployments using infrastructure-as-code and configuration management tools. I successfully created an AWS EKS cluster with Terraform and deployed applications to it in a streamlined, repeatable manner with Ansible.
 
+![diagram](https://github.com/Princeton45/ansible-kubernetes-deployment/blob/main/images/diagram.png)
+
 ## Technologies Used
 - **Infrastructure**: Terraform, AWS EKS
 - **Configuration Management**: Ansible
@@ -14,34 +16,41 @@ This project demonstrates my implementation of fully automated Kubernetes deploy
 ### Infrastructure Provisioning
 I used Terraform to create and manage the AWS EKS cluster, defining all infrastructure components as code. This approach ensures consistency and enables easy replication across different environments.
 
-![Terraform Plan Output Screenshot] <!-- Include screenshot of terraform plan/apply output -->
+![terraform](https://github.com/Princeton45/ansible-kubernetes-deployment/blob/main/images/terraform.png)
 
 ### Kubernetes Deployment Automation
 With the infrastructure in place, I wrote Ansible playbooks to:
-- Create a dedicated namespace in the Kubernetes cluster
+- Create a dedicated namespace in the Kubernetes cluster called `testing-my-app`
 - Deploy application components to this namespace
 - Configure necessary Kubernetes resources (deployments, services, etc.)
 
-![Ansible Playbook Execution] <!-- Include screenshot of ansible playbook running -->
+Note: I needed to export the kubeconfig file from AWS and place it in `/home/princeton/ansible-playbooks/kubeconfig-myapp` so Ansible can authenticate to the cluster with it.
 
-### Deployment Verification
-I verified the successful deployment using kubectl commands to inspect the running resources within the newly created namespace.
+`deploy-to-k8s.yaml`
+```yaml
+---
+- name: Deploy app in new Namespace
+  hosts: localhost
+  tasks:
+    - name: Create a k8s namespace
+      kubernetes.core.k8s:
+        name: testing-my-app
+        api_version: v1
+        kind: Namespace
+        state: present
+        kubeconfig: /home/princeton/ansible-playbooks/kubeconfig-myapp
+    - name: Deploy nginx app 
+      kubernetes.core.k8s:
+        src: /home/princeton/ansible-playbooks/nginx-config.yaml
+        state: present
+        kubeconfig: /home/princeton/ansible-playbooks/kubeconfig-myapp
+        namespace: testing-my-app
 
-![Kubernetes Resources Running] <!-- Include screenshot of kubectl get all output showing pods/services -->
+```
+![success1](https://github.com/Princeton45/ansible-kubernetes-deployment/blob/main/images/success1.png)
 
-## Architecture Diagram
-<!-- Include a simple diagram showing the workflow: Terraform → AWS EKS → Ansible → Deployed App -->
+![nginx-success](https://github.com/Princeton45/ansible-kubernetes-deployment/blob/main/images/nginx-success.png)
 
-## Key Achievements
-- Fully automated EKS cluster creation with Terraform
-- Isolated application deployment in dedicated namespace
-- Repeatable deployment process through Ansible playbooks
-- End-to-end automation of cloud infrastructure and application deployment
 
-## Future Enhancements
-- Implement CI/CD pipeline integration
-- Add monitoring and logging solutions
-- Create multi-environment support (dev, staging, prod)
 
-## Conclusion
-This project demonstrates my ability to implement modern DevOps practices by automating infrastructure provisioning and application deployment using industry-standard tools.
+
