@@ -1,0 +1,40 @@
+graph TD
+    A[DevOps Engineer] -->|Initiates Deployment| B[Terraform Code]
+    B -->|Creates| C[AWS EKS Cluster]
+    C -->|Available for| D[Ansible Playbook]
+    
+    D -->|Creates| E[Testing Namespace]
+    D -->|Deploys Application to| E
+    
+    E -->|Contains| F[Running Application]
+    F -->|Hosted on| G[AWS EKS Cluster]
+    
+    H[Kubernetes Ansible Modules] -.->|Used by| D
+    
+    subgraph "Infrastructure Provisioning"
+    B
+    C
+    G
+    end
+    
+    subgraph "Configuration Management"
+    D
+    H
+    end
+    
+    subgraph "Application Deployment"
+    E
+    F
+    end
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style G fill:#bbf,stroke:#333,stroke-width:2px
+    style F fill:#bfb,stroke:#333,stroke-width:2px
+    style H fill:#e6f7ff,stroke:#333,stroke-width:1px
+    style E fill:#ffe6cc,stroke:#333,stroke-width:1px
+    
+    %% Adjust spacing and node sizes
+    linkStyle default fontSize:12px
+    classDef node fontSize:14px,padding:10px
+    classDef labelClear fill:none,stroke:none
+    
